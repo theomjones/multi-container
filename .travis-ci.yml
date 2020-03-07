@@ -1,0 +1,28 @@
+sudo: required
+language: generic
+
+services:
+    - docker
+
+# build the dev react container so we can run jest tests
+before_install:
+    - docker build -t theomjones/react-test -f ./client/Dockerfile.dev ./client
+
+# Run the tests
+script:
+    - docker run -e CI=true USERNAME/react-test npm test
+
+# When tests have passed
+# Build prod versions of projects
+# Push images to docker hub
+after_success:
+    - docker build -t theomjones/multi-client ./client
+    - docker build -t theomjones/multi-server ./server
+    - docker build -t theomjones/multi-worker ./worker
+    - docker build -t theomjones/multi-nginx ./nginx
+    # Login to docker cli
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    - docker push theomjones/multi-client
+    - docker push theomjones/multi-nginx
+    - docker push theomjones/multi-worker
+    - docker push theomjones/multi-server
