@@ -10,7 +10,7 @@ before_install:
 
 # Run the tests
 script:
-    - docker run -e CI=true USERNAME/react-test npm test
+    - docker run -e CI=true theomjones/react-test npm test
 
 # When tests have passed
 # Build prod versions of projects
